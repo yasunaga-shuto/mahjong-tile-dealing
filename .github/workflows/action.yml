@@ -28,16 +28,3 @@ jobs:
         run: |
           python -m pytest app/main_test.py --junit-xml results/pytest.xml
         continue-on-error: true
-
-      # テスト結果の表示
-      - name: Upload Unit Test Results
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: Unit Test Results (Python 3.7)
-          path: results/*.xml
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          junit_files: artifacts/**/*.xml
