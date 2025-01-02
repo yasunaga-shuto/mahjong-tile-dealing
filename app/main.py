@@ -12,12 +12,15 @@ CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 
-pai = (
-  '1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '5mRed',
-  '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '5sRed',
-  '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '5pRed',
+PAI = (
+  '1m', '2m', '3m', '4m', '5m', '5mRed', '6m', '7m', '8m', '9m',
+  '1s', '2s', '3s', '4s', '5s', '5sRed', '6s', '7s', '8s', '9s',
+  '1p', '2p', '3p', '4p', '5p', '5pRed', '6p', '7p', '8p', '9p',
   'ton', 'nan', 'sha', 'pei', 'haku', 'hatsu', 'chun'
 )
+ORDER = {}
+for i, p in enumerate(PAI):
+  ORDER[p] = i
 
 def send_tile_dealing():
   # client = tweepy.Client(
@@ -31,13 +34,14 @@ def send_tile_dealing():
   # client.create_tweet(text="テスト")
 
   tile_dealing = select_tiles()
+  tile_dealing.sort(key=lambda val: ORDER[val])
   print(tile_dealing)
 
 def select_tiles():
   tiles = []
   while len(tiles) < 13:
-    num = random.randint(0, len(pai) - 1)
-    append_tile = pai[num]
+    num = random.randint(0, len(PAI) - 1)
+    append_tile = PAI[num]
     # 同じ赤が2枚以上入らないようにする
     if 'Red' in append_tile and append_tile in tiles:
       continue
@@ -54,7 +58,7 @@ def select_tiles():
     if (append_tile == '5p' or append_tile == '5pRed') and count_values(tiles, '5p') + count_values(tiles, '5pRed') == 4:
       continue
 
-    tiles.append(pai[num])
+    tiles.append(PAI[num])
 
   return tiles
 

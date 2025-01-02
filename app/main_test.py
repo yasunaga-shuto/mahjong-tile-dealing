@@ -1,5 +1,5 @@
 import unittest
-from main import select_tiles, pai, count_values
+from main import select_tiles, PAI, count_values
 import numpy as np
 
 class TestMain(unittest.TestCase):
@@ -32,7 +32,7 @@ class TestMain(unittest.TestCase):
     """
     for i in range(100):
       tiles = select_tiles()
-      for p in pai:
+      for p in PAI:
         self.assertLess(count_values(tiles, p), 5)
 
   def test_select_tiles_not_red_and_5tiles_more_than_4(self):
