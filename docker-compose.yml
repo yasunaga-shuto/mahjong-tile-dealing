@@ -1,0 +1,9 @@
+services:
+  api:
+    container_name: mahjong_tile_dealing
+    volumes:
+      - .:/app
+    command: sleep 10000000
+    build:
+      context: .
+      dockerfile: ./Dockerfile
