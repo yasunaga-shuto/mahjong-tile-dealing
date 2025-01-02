@@ -22,6 +22,13 @@ ORDER = {}
 for i, p in enumerate(PAI):
   ORDER[p] = i
 
+# 残り枚数
+PAI_COUNT = {}
+for p in PAI:
+  if 'Red' in p:
+    continue
+  PAI_COUNT[p] = 4
+
 def send_tile_dealing():
   # client = tweepy.Client(
   #   bearer_token=BEARER_TOKEN,
@@ -36,35 +43,26 @@ def send_tile_dealing():
   tile_dealing = select_tiles()
   tile_dealing.sort(key=lambda val: ORDER[val])
   print(tile_dealing)
+  print(PAI_COUNT)
 
 def select_tiles():
   tiles = []
   while len(tiles) < 13:
     num = random.randint(0, len(PAI) - 1)
     append_tile = PAI[num]
+    count_key = append_tile.replace('Red', '')
     # 同じ赤が2枚以上入らないようにする
     if 'Red' in append_tile and append_tile in tiles:
       continue
 
-    # 同じ牌が5枚以上入らないようにする
-    if count_values(tiles, append_tile) == 4:
-      continue
-
-    # 赤 + 黒が5枚以上入らないようにする
-    if (append_tile == '5m' or append_tile == '5mRed') and count_values(tiles, '5m') + count_values(tiles, '5mRed') == 4:
-      continue
-    if (append_tile == '5s' or append_tile == '5sRed') and count_values(tiles, '5s') + count_values(tiles, '5sRed') == 4:
-      continue
-    if (append_tile == '5p' or append_tile == '5pRed') and count_values(tiles, '5p') + count_values(tiles, '5pRed') == 4:
+    if PAI_COUNT[count_key] == 0:
       continue
 
     tiles.append(PAI[num])
+    print(PAI_COUNT)
+    PAI_COUNT[count_key] -= 1
 
   return tiles
-
-def count_values(arr, value):
-  y = np.array(arr)
-  return (y == value).sum()
 
 if __name__ == '__main__':
   send_tile_dealing()
