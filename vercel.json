@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/send",
-      "schedule": "15 7 * * *"
+      "schedule": "0 1 * * *"
     }
   ],
   "builds": [

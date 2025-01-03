@@ -37,8 +37,6 @@ for p in PAI:
 
 @app.get("/send")
 def send_tile_dealing(req: Request):
-  print(req.headers.get('Authorization'))
-  print("CRON_SECRET")
   if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
     return Response(status_code=401)
 
