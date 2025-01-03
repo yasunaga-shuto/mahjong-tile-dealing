@@ -4,7 +4,8 @@ import os
 import tweepy
 import random
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
+from fastapi.responses import Response
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
+CRON_SECRET = os.environ.get('CRON_SECRET')
 
 PAI = (
   '1m', '2m', '3m', '4m', '5m', '5mRed', '6m', '7m', '8m', '9m',
@@ -34,7 +36,10 @@ for p in PAI:
   PAI_COUNT[p] = 4
 
 @app.get("/send")
-def send_tile_dealing():
+def send_tile_dealing(req: Request):
+  if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
+    return Response(status_code=401)
+
   # ドラ表示牌
   dra_indicator, count_key = random_tile()
   PAI_COUNT[count_key] -= 1
