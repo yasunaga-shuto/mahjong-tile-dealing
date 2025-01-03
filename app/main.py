@@ -33,7 +33,7 @@ for p in PAI:
     continue
   PAI_COUNT[p] = 4
 
-@app.get("/")
+@app.get("/send")
 def send_tile_dealing():
   # ドラ表示牌
   dra_indicator, count_key = random_tile()
