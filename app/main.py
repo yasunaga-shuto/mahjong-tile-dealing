@@ -62,7 +62,7 @@ def send_tile_dealing():
     else:
       background.paste(back, (i * 36 + 270, 35))
 
-  background.save('tiles.webp', quality=100)
+  background.save('/tmp/tiles.webp', quality=100)
 
   # 送信
   auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -76,7 +76,7 @@ def send_tile_dealing():
     access_token_secret=ACCESS_TOKEN_SECRET,
     wait_on_rate_limit=True
   )
-  media = api.media_upload(filename='./tiles.webp')
+  media = api.media_upload(filename='/tmp/tiles.webp')
   client.create_tweet(text='', media_ids=[media.media_id])
 
 def select_tiles():
