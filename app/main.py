@@ -26,7 +26,7 @@ for i, p in enumerate(PAI):
 PAI_COUNT = {}
 for p in PAI:
   if 'Red' in p:
-      continue
+    continue
   PAI_COUNT[p] = 4
 
 def send_tile_dealing():
