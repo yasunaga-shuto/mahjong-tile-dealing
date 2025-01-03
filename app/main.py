@@ -3,7 +3,7 @@ import os
 import tweepy
 import random
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 load_dotenv()
 
@@ -54,10 +54,10 @@ def send_tile_dealing():
   background = Image.open('img/background.webp')
   for i, t in enumerate(tiles):
     img = Image.open(f'img/{t}.webp').resize((36, 49))
-    background.paste(img, (i * 36 + 30, 130))
+    background.paste(img, (i * 36 + 30, 120))
 
   drawn_tile_img = Image.open(f'img/{drawn_tile}.webp').resize((36, 49))
-  background.paste(drawn_tile_img, (508, 130))
+  background.paste(drawn_tile_img, (508, 120))
 
   dra_indicator_img = Image.open(f'img/{dra_indicator}.webp').resize((36, 49))
   back = Image.open('img/back.webp').resize((36, 49))
