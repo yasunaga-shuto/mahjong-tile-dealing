@@ -40,9 +40,9 @@ def send_tile_dealing():
   # )
   # client.create_tweet(text="テスト")
 
-  tile_dealing = select_tiles()
-  tile_dealing.sort(key=lambda val: ORDER[val])
-  print(tile_dealing)
+  # tile_dealing = select_tiles()
+  # tile_dealing.sort(key=lambda val: ORDER[val])
+  # print(tile_dealing)
   print(PAI_COUNT)
 
 def select_tiles():
