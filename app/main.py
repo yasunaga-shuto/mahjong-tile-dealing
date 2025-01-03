@@ -3,6 +3,7 @@ import os
 import tweepy
 import random
 import numpy as np
+from PIL import Image
 
 load_dotenv()
 
@@ -40,9 +41,15 @@ def send_tile_dealing():
   # )
   # client.create_tweet(text="テスト")
 
-  # tile_dealing = select_tiles()
-  # tile_dealing.sort(key=lambda val: ORDER[val])
-  # print(tile_dealing)
+  tiles = select_tiles()
+  tiles.sort(key=lambda val: ORDER[val])
+
+  background = Image.open('img/background.webp')
+  for i, t in enumerate(tiles):
+    img = Image.open(f'img/{t}.webp').resize((36, 49))
+    background.paste(img, (i * 36 + 30, 110))
+
+  background.save('test.webp', quality=95)
   print(PAI_COUNT)
 
 def select_tiles():
@@ -59,7 +66,6 @@ def select_tiles():
       continue
 
     tiles.append(PAI[num])
-    print(PAI_COUNT)
     PAI_COUNT[count_key] -= 1
 
   return tiles
