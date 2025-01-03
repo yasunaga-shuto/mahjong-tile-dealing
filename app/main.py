@@ -1,9 +1,12 @@
+from fastapi import FastAPI, Request, status
 from dotenv import load_dotenv
 import os
 import tweepy
 import random
 import numpy as np
 from PIL import Image, ImageDraw
+
+app = FastAPI()
 
 load_dotenv()
 
@@ -30,6 +33,7 @@ for p in PAI:
     continue
   PAI_COUNT[p] = 4
 
+@app.get("/")
 def send_tile_dealing():
   # ドラ表示牌
   dra_indicator, count_key = random_tile()
@@ -103,6 +107,3 @@ def draw_tile():
       break
 
   return tile
-
-if __name__ == '__main__':
-  send_tile_dealing()

@@ -2,8 +2,11 @@ services:
   api:
     container_name: mahjong_tile_dealing
     volumes:
-      - .:/app
-    command: sleep 10000000
+      - ./app:/app
+      - ./img:/app/img
+      - ./.env:/app/.env
     build:
       context: .
       dockerfile: ./Dockerfile
+    ports:
+      - 8080:8080
