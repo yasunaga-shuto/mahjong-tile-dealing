@@ -4,5 +4,17 @@
       "path": "/send",
       "schedule": "15 7 * * *"
     }
+  ],
+  "builds": [
+    {
+      "src": "app/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app/main.py"
+    }
   ]
 }
