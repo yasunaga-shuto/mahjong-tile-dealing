@@ -31,16 +31,6 @@ for p in PAI:
   PAI_COUNT[p] = 4
 
 def send_tile_dealing():
-  # client = tweepy.Client(
-  #   bearer_token=BEARER_TOKEN,
-  #   consumer_key=CONSUMER_KEY,
-  #   consumer_secret=CONSUMER_SECRET,
-  #   access_token=ACCESS_TOKEN,
-  #   access_token_secret=ACCESS_TOKEN_SECRET,
-  #   wait_on_rate_limit=True
-  # )
-  # client.create_tweet(text="テスト")
-
   # ドラ表示牌
   dra_indicator, count_key = random_tile()
   PAI_COUNT[count_key] -= 1
@@ -68,8 +58,22 @@ def send_tile_dealing():
     else:
       background.paste(back, (i * 36 + 270, 35))
 
-  background.save('test.webp', quality=100)
-  print(PAI_COUNT)
+  background.save('tiles.webp', quality=100)
+
+  # 送信
+  auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+  auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+  api = tweepy.API(auth)
+  client = tweepy.Client(
+    bearer_token=BEARER_TOKEN,
+    consumer_key=CONSUMER_KEY,
+    consumer_secret=CONSUMER_SECRET,
+    access_token=ACCESS_TOKEN,
+    access_token_secret=ACCESS_TOKEN_SECRET,
+    wait_on_rate_limit=True
+  )
+  media = api.media_upload(filename='./tiles.webp')
+  client.create_tweet(text='', media_ids=[media.media_id])
 
 def select_tiles():
   tiles = []
