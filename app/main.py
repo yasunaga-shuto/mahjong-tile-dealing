@@ -32,8 +32,11 @@ for i, p in enumerate(PAI):
 PAI_COUNT = {}
 for p in PAI:
   if 'Red' in p:
-    continue
-  PAI_COUNT[p] = 4
+    PAI_COUNT[p] = 1
+  elif '5' in p:
+    PAI_COUNT[p] = 3
+  else:
+    PAI_COUNT[p] = 4
 
 @app.get("/send")
 def send_tile_dealing(req: Request):
@@ -41,8 +44,8 @@ def send_tile_dealing(req: Request):
     return Response(status_code=401)
 
   # ドラ表示牌
-  dra_indicator, count_key = random_tile()
-  PAI_COUNT[count_key] -= 1
+  dra_indicator = random_tile()
+  PAI_COUNT[dra_indicator] -= 1
   # 配牌
   tiles = select_tiles()
   tiles.sort(key=lambda val: ORDER[val])
@@ -87,28 +90,28 @@ def send_tile_dealing(req: Request):
 def select_tiles():
   tiles = []
   while len(tiles) < 13:
-    append_tile, count_key = random_tile()
+    append_tile = random_tile()
     # 同じ赤が2枚以上入らないようにする
     if 'Red' in append_tile and append_tile in tiles:
       continue
 
-    if PAI_COUNT[count_key] == 0:
+    if PAI_COUNT[append_tile] == 0:
       continue
 
     tiles.append(append_tile)
-    PAI_COUNT[count_key] -= 1
+    PAI_COUNT[append_tile] -= 1
 
   return tiles
 
 def random_tile():
   num = random.randint(0, len(PAI) - 1)
   tile = PAI[num]
-  return tile, tile.replace('Red', '')
+  return tile
 
 def draw_tile():
   while True:
-    tile, count_key = random_tile()
-    if PAI_COUNT[count_key] > 0:
+    tile = random_tile()
+    if PAI_COUNT[tile] > 0:
       break
 
   return tile
