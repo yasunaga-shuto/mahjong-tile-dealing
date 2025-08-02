@@ -1,5 +1,5 @@
 import unittest
-from main import select_tiles, TILES
+from main import select_tiles, TILES, new_tile_count
 import numpy as np
 
 class TestMain(unittest.TestCase):
@@ -9,32 +9,32 @@ class TestMain(unittest.TestCase):
   def test_select_tiles_5mRed_not_more_than_2(self):
     """test method for select tiles
     """
-    tiles = select_tiles(TILES)
+    tiles = select_tiles(TILES, new_tile_count())
     self.assertLess(count_values(tiles, '5mRed'), 2)
 
   def test_select_tiles_5sRed_not_more_than_2(self):
     """test method for select tiles
     """
-    tiles = select_tiles(TILES)
+    tiles = select_tiles(TILES, new_tile_count())
     self.assertLess(count_values(tiles, '5sRed'), 2)
 
   def test_select_tiles_5pRed_not_more_than_2(self):
     """test method for select tiles
     """
-    tiles = select_tiles(TILES)
+    tiles = select_tiles(TILES, new_tile_count())
     self.assertLess(count_values(tiles, '5pRed'), 2)
 
   def test_select_tiles_not_same_tiles_more_than_4(self):
     """test method for select tiles
     """
-    tiles = select_tiles(TILES)
+    tiles = select_tiles(TILES, new_tile_count())
     for p in TILES:
       self.assertLess(count_values(tiles, p), 5)
 
   def test_select_tiles_not_red_and_5tiles_more_than_4(self):
     """test method for select tiles
     """
-    tiles = select_tiles(TILES)
+    tiles = select_tiles(TILES, new_tile_count())
     if '5mRed' in tiles:
       self.assertLess(count_values(tiles, '5m'), 4)
     if '5sRed' in tiles:
