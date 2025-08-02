@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, status
 from dotenv import load_dotenv
+from typing import List
 import os
 import tweepy
 import random
@@ -18,19 +19,19 @@ ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CRON_SECRET = os.environ.get('CRON_SECRET')
 
-PAI = (
+TILES = (
   '1m', '2m', '3m', '4m', '5m', '5mRed', '6m', '7m', '8m', '9m',
   '1p', '2p', '3p', '4p', '5p', '5pRed', '6p', '7p', '8p', '9p',
   '1s', '2s', '3s', '4s', '5s', '5sRed', '6s', '7s', '8s', '9s',
   'ton', 'nan', 'sha', 'pei', 'haku', 'hatsu', 'chun'
 )
 ORDER = {}
-for i, p in enumerate(PAI):
+for i, p in enumerate(TILES):
   ORDER[p] = i
 
 # 残り枚数
 PAI_COUNT = {}
-for p in PAI:
+for p in TILES:
   if 'Red' in p:
     PAI_COUNT[p] = 1
   elif '5' in p:
@@ -40,14 +41,14 @@ for p in PAI:
 
 @app.get("/send")
 def send_tile_dealing(req: Request):
-  if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
-    return Response(status_code=401)
+  # if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
+  #   return Response(status_code=401)
 
   # ドラ表示牌
-  dra_indicator = random_tile()
+  dra_indicator = random_tile(TILES)
   PAI_COUNT[dra_indicator] -= 1
   # 配牌
-  tiles = select_tiles()
+  tiles = select_tiles(TILES)
   tiles.sort(key=lambda val: ORDER[val])
 
   # ツモ牌
@@ -87,10 +88,27 @@ def send_tile_dealing(req: Request):
   media = api.media_upload(filename='/tmp/tiles.webp')
   client.create_tweet(text='', media_ids=[media.media_id])
 
-def select_tiles():
+@app.get("/send/full-flush")
+def send_full_flush(req: Request):
+  if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
+    return Response(status_code=401)
+  FLUSH_TILES = tuple(tile for tile in TILES if tile.startswith(('1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m')) or tile == '5mRed')
+  tiles = select_tiles(FLUSH_TILES)
+  tiles.sort(key=lambda val: ORDER[val])
+
+  background = Image.open('img/background.webp')
+  for i, t in enumerate(tiles):
+    img = Image.open(f'img/{t}.webp').resize((36, 49))
+    background.paste(img, (i * 36 + 50, 80))
+
+  background.save('./tiles.webp', quality=100)
+
+  print(tiles)
+
+def select_tiles(from_tiles: List[str]):
   tiles = []
   while len(tiles) < 13:
-    append_tile = random_tile()
+    append_tile = random_tile(from_tiles)
     # 同じ赤が2枚以上入らないようにする
     if 'Red' in append_tile and append_tile in tiles:
       continue
@@ -103,9 +121,9 @@ def select_tiles():
 
   return tiles
 
-def random_tile():
-  num = random.randint(0, len(PAI) - 1)
-  tile = PAI[num]
+def random_tile(from_tiles: List[str]):
+  num = random.randint(0, len(from_tiles) - 1)
+  tile = from_tiles[num]
   return tile
 
 def draw_tile():
