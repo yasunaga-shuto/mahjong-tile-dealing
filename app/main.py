@@ -65,19 +65,7 @@ def send_tile_dealing(req: Request):
   background.save('/tmp/tiles.webp', quality=100)
 
   # 送信
-  auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-  auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-  api = tweepy.API(auth)
-  client = tweepy.Client(
-    bearer_token=BEARER_TOKEN,
-    consumer_key=CONSUMER_KEY,
-    consumer_secret=CONSUMER_SECRET,
-    access_token=ACCESS_TOKEN,
-    access_token_secret=ACCESS_TOKEN_SECRET,
-    wait_on_rate_limit=True
-  )
-  media = api.media_upload(filename='/tmp/tiles.webp')
-  client.create_tweet(text='', media_ids=[media.media_id])
+  post_to_x('')
 
 @app.get("/send/full-flush")
 def send_full_flush(req: Request):
@@ -161,12 +149,14 @@ def send_full_flush(req: Request):
       break
 
   tiles.sort(key=lambda val: ORDER[val])
-  background = Image.open('img/background.webp')
+  background = Image.open('img/background2.webp')
   for i, t in enumerate(tiles):
     img = Image.open(f'img/{t}.webp').resize((36, 49))
     background.paste(img, (i * 36 + 50, 80))
 
-  background.save('./tiles.webp', quality=100)
+  background.save('/tmp/tiles.webp', quality=100)
+
+  post_to_x('何待ち？')
 
 def select_tiles(from_tiles: List[str], tile_count):
   tiles = []
@@ -208,3 +198,19 @@ def new_tile_count():
     else:
       tile_count[p] = 4
   return tile_count
+
+def post_to_x(text):
+  # 送信
+  auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+  auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+  api = tweepy.API(auth)
+  client = tweepy.Client(
+    bearer_token=BEARER_TOKEN,
+    consumer_key=CONSUMER_KEY,
+    consumer_secret=CONSUMER_SECRET,
+    access_token=ACCESS_TOKEN,
+    access_token_secret=ACCESS_TOKEN_SECRET,
+    wait_on_rate_limit=True
+  )
+  media = api.media_upload(filename='/tmp/tiles.webp')
+  client.create_tweet(text=text, media_ids=[media.media_id])
