@@ -29,16 +29,6 @@ ORDER = {}
 for i, p in enumerate(TILES):
   ORDER[p] = i
 
-# 残り枚数
-PAI_COUNT = {}
-for p in TILES:
-  if 'Red' in p:
-    PAI_COUNT[p] = 1
-  elif '5' in p:
-    PAI_COUNT[p] = 3
-  else:
-    PAI_COUNT[p] = 4
-
 @app.get("/send")
 def send_tile_dealing(req: Request):
   # if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
@@ -46,13 +36,14 @@ def send_tile_dealing(req: Request):
 
   # ドラ表示牌
   dra_indicator = random_tile(TILES)
-  PAI_COUNT[dra_indicator] -= 1
+  tile_count = new_tile_count()
+  tile_count[dra_indicator] -= 1
   # 配牌
-  tiles = select_tiles(TILES)
+  tiles = select_tiles(TILES, tile_count)
   tiles.sort(key=lambda val: ORDER[val])
 
   # ツモ牌
-  drawn_tile = draw_tile()
+  drawn_tile = draw_tile(TILES, tile_count)
 
   background = Image.open('img/background.webp')
   for i, t in enumerate(tiles):
@@ -177,7 +168,7 @@ def send_full_flush(req: Request):
 
   background.save('./tiles.webp', quality=100)
 
-def select_tiles(from_tiles: List[str]):
+def select_tiles(from_tiles: List[str], tile_count):
   tiles = []
   while len(tiles) < 13:
     append_tile = random_tile(from_tiles)
@@ -185,11 +176,11 @@ def select_tiles(from_tiles: List[str]):
     if 'Red' in append_tile and append_tile in tiles:
       continue
 
-    if PAI_COUNT[append_tile] == 0:
+    if tile_count[append_tile] == 0:
       continue
 
     tiles.append(append_tile)
-    PAI_COUNT[append_tile] -= 1
+    tile_count[append_tile] -= 1
 
   return tiles
 
@@ -198,10 +189,10 @@ def random_tile(from_tiles: List[str]):
   tile = from_tiles[num]
   return tile
 
-def draw_tile():
+def draw_tile(from_tiles, tile_count):
   while True:
-    tile = random_tile()
-    if PAI_COUNT[tile] > 0:
+    tile = random_tile(from_tiles)
+    if tile_count[tile] > 0:
       break
 
   return tile
