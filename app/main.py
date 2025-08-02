@@ -90,20 +90,92 @@ def send_tile_dealing(req: Request):
 
 @app.get("/send/full-flush")
 def send_full_flush(req: Request):
-  if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
-    return Response(status_code=401)
-  FLUSH_TILES = tuple(tile for tile in TILES if tile.startswith(('1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m')) or tile == '5mRed')
-  tiles = select_tiles(FLUSH_TILES)
-  tiles.sort(key=lambda val: ORDER[val])
+  # if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
+  #   return Response(status_code=401)
+  FLUSH_TILES = tuple(tile for tile in TILES if tile in {'1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m'})
 
+  SEQUENCES = (
+    ['1m', '2m', '3m'],
+    ['2m', '3m', '4m'],
+    ['3m', '4m', '5m'],
+    ['5m', '6m', '7m'],
+    ['7m', '8m', '9m'],
+  )
+  SERIAL_PAIRS = (
+    ['1m', '1m'],
+    ['1m', '2m'],
+    ['1m', '3m'],
+    ['2m', '2m'],
+    ['2m', '3m'],
+    ['2m', '4m'],
+    ['3m', '3m'],
+    ['3m', '4m'],
+    ['3m', '5m'],
+    ['4m', '4m'],
+    ['4m', '5m'],
+    ['4m', '6m'],
+    ['5m', '5m'],
+    ['5m', '6m'],
+    ['5m', '7m'],
+    ['6m', '6m'],
+    ['6m', '7m'],
+    ['6m', '8m'],
+    ['7m', '7m'],
+    ['7m', '8m'],
+    ['7m', '9m'],
+    ['8m', '8m'],
+    ['8m', '9m'],
+    ['9m', '9m'],
+  )
+  tile_count = new_tile_count()
+
+  tiles = []
+  # 雀頭を選択
+  head_tile = random_tile(FLUSH_TILES)
+  tile_count[head_tile] -= 2
+  tiles.append(head_tile)
+  tiles.append(head_tile)
+
+  # 面子を3つ選択
+  # 1: 順子, 0: 刻子
+  while len(tiles) < 11:
+    is_sequence = random.randint(0, 1)
+    if is_sequence:
+      seq = random.choice(SEQUENCES)
+      # 0枚じゃないか確認
+      ok = True
+      for s in seq:
+        if tile_count[s] <= 0:
+          ok = False
+      if not ok:
+        continue
+
+      for s in seq:
+        tile_count[s] -= 1
+      tiles.extend(seq)
+    else:
+      tile = random_tile(FLUSH_TILES)
+      if tile_count[tile] >= 3:
+        tile_count[tile] -= 3
+        tiles.extend([tile, tile, tile])
+
+  # 最後のターツを選択
+  while True:
+    pair = random.choice(SERIAL_PAIRS)
+    # 全ての牌が1枚以上残っているかをチェック
+    if all(tile_count[p] >= 1 for p in pair):
+      for p in pair:
+        tile_count[p] -= 1
+      tiles.extend(pair)
+      break
+
+  tiles.sort(key=lambda val: ORDER[val])
   background = Image.open('img/background.webp')
   for i, t in enumerate(tiles):
     img = Image.open(f'img/{t}.webp').resize((36, 49))
     background.paste(img, (i * 36 + 50, 80))
 
   background.save('./tiles.webp', quality=100)
-
-  print(tiles)
 
 def select_tiles(from_tiles: List[str]):
   tiles = []
@@ -133,3 +205,15 @@ def draw_tile():
       break
 
   return tile
+
+def new_tile_count():
+  # 残り枚数
+  tile_count = {}
+  for p in TILES:
+    if 'Red' in p:
+      tile_count[p] = 1
+    elif '5' in p:
+      tile_count[p] = 3
+    else:
+      tile_count[p] = 4
+  return tile_count
