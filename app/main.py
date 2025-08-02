@@ -31,8 +31,8 @@ for i, p in enumerate(TILES):
 
 @app.get("/send")
 def send_tile_dealing(req: Request):
-  # if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
-  #   return Response(status_code=401)
+  if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
+    return Response(status_code=401)
 
   # ドラ表示牌
   dra_indicator = random_tile(TILES)
@@ -69,8 +69,8 @@ def send_tile_dealing(req: Request):
 
 @app.get("/send/full-flush")
 def send_full_flush(req: Request):
-  # if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
-  #   return Response(status_code=401)
+  if req.headers.get('Authorization') != f"Bearer {CRON_SECRET}":
+    return Response(status_code=401)
   FLUSH_TILES = tuple(tile for tile in TILES if tile in {'1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m'})
 
   SEQUENCES = (
